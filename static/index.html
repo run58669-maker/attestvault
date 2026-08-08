@@ -1,0 +1,1149 @@
+<title>AttestVault</title>
+<style>
+  :root {
+    --bg: #0b0d10;
+    --panel: #111417;
+    --panel-2: #14181c;
+    --border: #23282e;
+    --border-soft: #1b1f24;
+    --text: #d7dbe0;
+    --text-dim: #838d99;
+    --text-faint: #565f68;
+    --accent: #4b8bff;
+    --green: #35c98f;
+    --green-bg: rgba(53, 201, 143, 0.12);
+    --red: #ef5a6f;
+    --red-bg: rgba(239, 90, 111, 0.12);
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  body {
+    padding: 20px 24px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  code, .mono { font-family: var(--mono); }
+
+  a { color: var(--accent); }
+
+  /* ---------- top bar ---------- */
+
+  .topbar {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 20px;
+  }
+
+  .topbar-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-bottom: 14px;
+  }
+
+  .topbar-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: #f0f2f4;
+  }
+
+  .topbar-sub {
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  .rails-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    border-top: 1px solid var(--border-soft);
+    padding-top: 12px;
+  }
+
+  .rail-item {
+    font-size: 12px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .rail-item .label {
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 10.5px;
+  }
+
+  .rail-item .val {
+    font-family: var(--mono);
+    color: var(--text);
+    cursor: default;
+  }
+
+  .badge-chain {
+    display: inline-block;
+    border: 1px solid #2c3a52;
+    background: #16202f;
+    color: #7fa8f5;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--mono);
+  }
+
+  /* ---------- layout ---------- */
+
+  .grid {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 980px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    border-radius: 8px;
+    padding: 16px 18px 18px;
+    margin-bottom: 20px;
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .panel-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #c4cad2;
+  }
+
+  .panel-count {
+    font-size: 11px;
+    color: var(--text-faint);
+    font-family: var(--mono);
+  }
+
+  /* ---------- buttons / inputs ---------- */
+
+  button {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text);
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  button:hover:not(:disabled) {
+    border-color: #3a4149;
+    background: #1a1f24;
+  }
+
+  button:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  button.primary {
+    background: #1b3a6b;
+    border-color: #2a4d84;
+    color: #cfe0ff;
+  }
+
+  button.primary:hover:not(:disabled) {
+    background: #204a86;
+  }
+
+  button.danger {
+    color: #ffb3bd;
+    border-color: #55232c;
+    background: #2a1418;
+  }
+
+  button.danger:hover:not(:disabled) {
+    background: #3a1b21;
+  }
+
+  button.small {
+    padding: 4px 9px;
+    font-size: 11.5px;
+  }
+
+  input[type="text"], input[type="number"], select {
+    width: 100%;
+    background: #0d1013;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 5px;
+    padding: 7px 9px;
+    font-family: var(--sans);
+    font-size: 12.5px;
+  }
+
+  select { font-family: var(--sans); }
+  option { background: #0d1013; }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: #3f5f96;
+  }
+
+  label.field {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  label.field .lbl {
+    display: block;
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: -1px;
+    margin-right: 5px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- investors ---------- */
+
+  .investor-card {
+    border: 1px solid var(--border-soft);
+    background: var(--panel-2);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+
+  .investor-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .investor-name {
+    font-weight: 600;
+    color: #eceff2;
+    font-size: 13px;
+  }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-family: var(--mono);
+  }
+
+  .badge-active { background: var(--green-bg); color: var(--green); }
+  .badge-frozen { background: var(--red-bg); color: var(--red); }
+
+  .investor-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .investor-meta .tier {
+    font-family: var(--sans);
+    color: var(--text-faint);
+  }
+
+  .investor-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .empty-note {
+    color: var(--text-faint);
+    font-size: 12px;
+    padding: 10px 2px;
+  }
+
+  /* ---------- vault holdings ---------- */
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+
+  th {
+    text-align: left;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--text);
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .forms-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 720px) {
+    .forms-row { grid-template-columns: 1fr; }
+  }
+
+  .form-box {
+    border: 1px solid var(--border-soft);
+    background: var(--panel-2);
+    border-radius: 6px;
+    padding: 12px 14px 14px;
+  }
+
+  .form-box h4 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+  }
+
+  /* ---------- audit log ---------- */
+
+  .audit-row {
+    display: grid;
+    grid-template-columns: 92px 76px 130px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 5px;
+    border-left: 3px solid transparent;
+    font-size: 12.5px;
+    margin-bottom: 4px;
+  }
+
+  .audit-row.allow {
+    background: var(--green-bg);
+    border-left-color: var(--green);
+  }
+
+  .audit-row.deny {
+    background: var(--red-bg);
+    border-left-color: var(--red);
+  }
+
+  .audit-row.flash {
+    animation: flashin 1.1s ease-out;
+  }
+
+  @keyframes flashin {
+    0% { background: rgba(255,255,255,0.18); }
+  }
+
+  .audit-ts {
+    color: var(--text-faint);
+    font-family: var(--mono);
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .audit-gate {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: #1c2127;
+    color: var(--text-dim);
+    width: fit-content;
+  }
+
+  .audit-subject {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .audit-verdict {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+
+  .audit-verdict.allow-text { color: var(--green); }
+  .audit-verdict.deny-text { color: var(--red); }
+
+  .audit-list {
+    max-height: 480px;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 720px) {
+    .audit-row {
+      grid-template-columns: 1fr;
+      gap: 3px;
+    }
+  }
+
+  /* ---------- footer ---------- */
+
+  .footnote {
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 11.5px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  /* ---------- toast ---------- */
+
+  #toast-stack {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 999;
+  }
+
+  .toast {
+    background: #1a1e23;
+    border: 1px solid #3a2226;
+    color: #ffc7cd;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    max-width: 340px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    animation: toastin 0.2s ease-out;
+  }
+
+  @keyframes toastin {
+    from { opacity: 0; transform: translateY(6px); }
+  }
+
+  /* ---------- modal ---------- */
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 998;
+  }
+
+  .modal-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    width: 300px;
+  }
+
+  .modal-box h4 {
+    margin: 0 0 12px;
+    font-size: 13px;
+    color: #eceff2;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .hidden { display: none !important; }
+</style>
+
+<div class="topbar">
+  <div class="topbar-head">
+    <div>
+      <div class="topbar-title">AttestVault</div>
+      <div class="topbar-sub">Compliance-gated RWA vault on Cleanverse rails <span id="chain-badge-wrap"></span></div>
+    </div>
+  </div>
+  <div class="rails-strip" id="rails-strip">
+    <span class="rail-item"><span class="label">Loading rails…</span></span>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="col-left">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Investors</div>
+        <button class="primary small" id="btn-onboard">+ Onboard investor</button>
+      </div>
+      <div id="investors-list">
+        <div class="empty-note">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-right">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Vault</div>
+        <span class="panel-count" id="holdings-count"></span>
+      </div>
+      <table id="holdings-table">
+        <thead>
+          <tr>
+            <th>A-Token</th>
+            <th>Symbol</th>
+            <th>Origin token</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="holdings-body">
+          <tr><td colspan="4" class="empty-note">Loading…</td></tr>
+        </tbody>
+      </table>
+
+      <div class="forms-row">
+        <div class="form-box">
+          <h4>Deposit</h4>
+          <form id="form-deposit">
+            <label class="field">
+              <span class="lbl">Token address</span>
+              <select id="deposit-token"></select>
+            </label>
+            <label class="field">
+              <span class="lbl">Amount</span>
+              <input type="number" id="deposit-amount" step="any" min="0" value="1000" required>
+            </label>
+            <button type="submit" class="primary" id="btn-deposit">Deposit</button>
+          </form>
+        </div>
+
+        <div class="form-box">
+          <h4>Transfer</h4>
+          <form id="form-transfer">
+            <label class="field">
+              <span class="lbl">A-Token</span>
+              <select id="transfer-token"></select>
+            </label>
+            <label class="field">
+              <span class="lbl">To</span>
+              <select id="transfer-to"></select>
+            </label>
+            <label class="field">
+              <span class="lbl">Amount</span>
+              <input type="number" id="transfer-amount" step="any" min="0" value="250" required>
+            </label>
+            <button type="submit" class="primary" id="btn-transfer">Transfer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Audit Log</div>
+        <span class="panel-count" id="audit-count"></span>
+      </div>
+      <div class="audit-list" id="audit-list">
+        <div class="empty-note">Loading…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footnote">
+  Every decision is backed by on-chain evidence on Monad. Denied transfers are never constructed — fail closed.
+</div>
+
+<div id="toast-stack"></div>
+
+<div id="onboard-modal" class="modal-backdrop hidden">
+  <div class="modal-box">
+    <h4>Onboard investor</h4>
+    <label class="field">
+      <span class="lbl">Name</span>
+      <input type="text" id="onboard-name" placeholder="Alice">
+    </label>
+    <div class="modal-actions">
+      <button id="onboard-cancel">Cancel</button>
+      <button class="primary" id="onboard-confirm">Onboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var state = {
+    chain: "",
+    rails: [],
+    holdings: [],
+    investors: [],
+    audit: []
+  };
+
+  var seenAuditKeys = new Set();
+
+  // ---------- helpers ----------
+
+  function truncateAddr(addr) {
+    if (!addr) return "—";
+    if (addr.length <= 12) return addr;
+    return addr.slice(0, 6) + "…" + addr.slice(-4);
+  }
+
+  function el(tag, attrs, children) {
+    var e = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        if (k === "class") e.className = attrs[k];
+        else if (k === "text") e.textContent = attrs[k];
+        else if (k === "html") e.innerHTML = attrs[k];
+        else e.setAttribute(k, attrs[k]);
+      });
+    }
+    (children || []).forEach(function (c) { if (c) e.appendChild(c); });
+    return e;
+  }
+
+  function addrSpan(addr, cls) {
+    var s = el("span", { class: (cls || "") + " mono", title: addr || "" });
+    s.textContent = truncateAddr(addr);
+    return s;
+  }
+
+  function fmtTs(ts) {
+    if (!ts) return "—";
+    var d = new Date(ts * 1000);
+    var hh = String(d.getHours()).padStart(2, "0");
+    var mm = String(d.getMinutes()).padStart(2, "0");
+    var ss = String(d.getSeconds()).padStart(2, "0");
+    return hh + ":" + mm + ":" + ss;
+  }
+
+  function showToast(msg) {
+    var stack = document.getElementById("toast-stack");
+    var t = el("div", { class: "toast", text: msg });
+    stack.appendChild(t);
+    setTimeout(function () {
+      t.style.transition = "opacity 0.3s";
+      t.style.opacity = "0";
+      setTimeout(function () { t.remove(); }, 300);
+    }, 4500);
+  }
+
+  function setBtnLoading(btn, loading, labelDefault) {
+    if (loading) {
+      btn.disabled = true;
+      btn.dataset.origText = btn.textContent;
+      btn.innerHTML = "";
+      btn.appendChild(el("span", { class: "spinner" }));
+      btn.appendChild(document.createTextNode(labelDefault || "Working…"));
+    } else {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.origText || labelDefault || "";
+    }
+  }
+
+  async function api(path, opts) {
+    var res;
+    try {
+      res = await fetch(path, opts);
+    } catch (err) {
+      throw new Error("Network error calling " + path);
+    }
+    var body = null;
+    try { body = await res.json(); } catch (e) { /* no body */ }
+    if (!res.ok) {
+      var msg = (body && (body.error || body.message)) || ("Request failed (" + res.status + ")");
+      throw new Error(msg);
+    }
+    return body;
+  }
+
+  // ---------- rendering: top bar ----------
+
+  function renderRails() {
+    var strip = document.getElementById("rails-strip");
+    var badgeWrap = document.getElementById("chain-badge-wrap");
+    strip.innerHTML = "";
+    badgeWrap.innerHTML = "";
+
+    if (state.chain) {
+      var b = el("span", { class: "badge-chain", text: state.chain });
+      badgeWrap.appendChild(document.createTextNode("· "));
+      badgeWrap.appendChild(b);
+    }
+
+    if (!state.rails || !state.rails.length) {
+      strip.appendChild(el("span", { class: "rail-item" }, [
+        el("span", { class: "label", text: "No rails reported" })
+      ]));
+      return;
+    }
+
+    state.rails.forEach(function (rail) {
+      var at = rail.atoken || {};
+      var ot = rail.origin_token || {};
+
+      strip.appendChild(el("span", { class: "rail-item" }, [
+        el("span", { class: "label", text: (at.symbol || "A-Token") + " address" }),
+        addrSpan(at.address, "val")
+      ]));
+
+      if (ot.address) {
+        strip.appendChild(el("span", { class: "rail-item" }, [
+          el("span", { class: "label", text: "Origin (" + (ot.symbol || "") + ")" }),
+          addrSpan(ot.address, "val")
+        ]));
+      }
+
+      strip.appendChild(el("span", { class: "rail-item" }, [
+        el("span", { class: "label", text: "Access core" }),
+        addrSpan(rail.accesscore_address, "val")
+      ]));
+
+      strip.appendChild(el("span", { class: "rail-item" }, [
+        el("span", { class: "label", text: "A-Pass contract" }),
+        addrSpan(rail.apass_address, "val")
+      ]));
+    });
+  }
+
+  // ---------- rendering: investors ----------
+
+  function renderInvestors() {
+    var list = document.getElementById("investors-list");
+    list.innerHTML = "";
+
+    if (!state.investors || !state.investors.length) {
+      list.appendChild(el("div", { class: "empty-note", text: "No investors onboarded yet." }));
+      return;
+    }
+
+    state.investors.forEach(function (inv) {
+      var frozen = !!inv.frozen;
+
+      var badge = el("span", {
+        class: "badge " + (frozen ? "badge-frozen" : "badge-active"),
+        text: frozen ? "FROZEN" : "ACTIVE"
+      });
+
+      var top = el("div", { class: "investor-top" }, [
+        el("span", { class: "investor-name", text: inv.name || "(unnamed)" }),
+        badge
+      ]);
+
+      var meta = el("div", { class: "investor-meta" }, [
+        addrSpan(inv.address, ""),
+        el("span", { class: "tier", text: "Tier: " + (inv.tier || "—") + (inv.customer_id ? " · Customer " + inv.customer_id : "") })
+      ]);
+
+      var freezeBtn = el("button", {
+        class: "small " + (frozen ? "" : "danger")
+      });
+      freezeBtn.textContent = frozen ? "Unfreeze" : "Freeze";
+      freezeBtn.addEventListener("click", function () {
+        doFreeze(inv.address, !frozen, freezeBtn);
+      });
+
+      var actions = el("div", { class: "investor-actions" }, [freezeBtn]);
+
+      var card = el("div", { class: "investor-card" }, [top, meta, actions]);
+      list.appendChild(card);
+    });
+  }
+
+  async function doFreeze(address, freeze, btn) {
+    setBtnLoading(btn, true, freeze ? "Freezing…" : "Unfreezing…");
+    try {
+      await api("/api/freeze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: address, freeze: freeze, reason: freeze ? "manual freeze via console" : "manual unfreeze via console" })
+      });
+      await refreshState();
+    } catch (err) {
+      showToast(err.message);
+    } finally {
+      setBtnLoading(btn, false);
+    }
+  }
+
+  // ---------- rendering: onboard modal ----------
+
+  var onboardModal = document.getElementById("onboard-modal");
+  var onboardNameInput = document.getElementById("onboard-name");
+
+  document.getElementById("btn-onboard").addEventListener("click", function () {
+    onboardNameInput.value = "";
+    onboardModal.classList.remove("hidden");
+    onboardNameInput.focus();
+  });
+
+  document.getElementById("onboard-cancel").addEventListener("click", function () {
+    onboardModal.classList.add("hidden");
+  });
+
+  onboardModal.addEventListener("click", function (e) {
+    if (e.target === onboardModal) onboardModal.classList.add("hidden");
+  });
+
+  document.getElementById("onboard-confirm").addEventListener("click", async function () {
+    var btn = document.getElementById("onboard-confirm");
+    var name = onboardNameInput.value.trim() || ("Investor " + Math.floor(Math.random() * 10000));
+    setBtnLoading(btn, true, "Onboarding…");
+    try {
+      await api("/api/onboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name })
+      });
+      onboardModal.classList.add("hidden");
+      showToast("Onboarded " + name);
+      await refreshState();
+    } catch (err) {
+      showToast(err.message);
+    } finally {
+      setBtnLoading(btn, false, "Onboard");
+    }
+  });
+
+  // ---------- rendering: holdings + form options ----------
+
+  function renderHoldings() {
+    var body = document.getElementById("holdings-body");
+    var count = document.getElementById("holdings-count");
+    body.innerHTML = "";
+    count.textContent = state.holdings.length ? (state.holdings.length + " asset" + (state.holdings.length === 1 ? "" : "s")) : "";
+
+    if (!state.holdings.length) {
+      body.appendChild(el("tr", {}, [
+        el("td", { colspan: "4", class: "empty-note", text: "No holdings yet." })
+      ]));
+      return;
+    }
+
+    state.holdings.forEach(function (h) {
+      var row = el("tr", {}, [
+        el("td", {}, [addrSpan(h.atoken, "")]),
+        el("td", { text: h.symbol || "—" }),
+        el("td", {}, [addrSpan(h.origin_token, "")]),
+        el("td", { class: "mono", text: h.amount != null ? String(h.amount) : "0" })
+      ]);
+      body.appendChild(row);
+    });
+  }
+
+  function firstAtoken() {
+    if (state.rails && state.rails.length && state.rails[0].atoken) {
+      return state.rails[0].atoken;
+    }
+    return null;
+  }
+
+  function randomAddress() {
+    var chars = "0123456789abcdef";
+    var out = "0x";
+    for (var i = 0; i < 40; i++) out += chars[Math.floor(Math.random() * chars.length)];
+    return out;
+  }
+
+  function renderFormOptions() {
+    var at = firstAtoken();
+
+    // deposit token select
+    var depositSel = document.getElementById("deposit-token");
+    var prevDeposit = depositSel.value;
+    depositSel.innerHTML = "";
+    if (at) {
+      depositSel.appendChild(el("option", {
+        value: at.address,
+        text: (at.symbol || "A-Token") + " — " + truncateAddr(at.address)
+      }));
+    }
+    depositSel.appendChild(el("option", {
+      value: "__random__",
+      text: "Unknown token (random) — will be denied"
+    }));
+    if (prevDeposit && [].slice.call(depositSel.options).some(function (o) { return o.value === prevDeposit; })) {
+      depositSel.value = prevDeposit;
+    }
+
+    // transfer token select (fixed to aUSDC / first atoken)
+    var transferSel = document.getElementById("transfer-token");
+    transferSel.innerHTML = "";
+    if (at) {
+      transferSel.appendChild(el("option", {
+        value: at.address,
+        text: (at.symbol || "A-Token") + " — " + truncateAddr(at.address)
+      }));
+    } else {
+      transferSel.appendChild(el("option", { value: "", text: "No A-Token on rails" }));
+    }
+
+    // transfer "to" select
+    var toSel = document.getElementById("transfer-to");
+    var prevTo = toSel.value;
+    toSel.innerHTML = "";
+    (state.investors || []).forEach(function (inv) {
+      toSel.appendChild(el("option", {
+        value: inv.address,
+        text: (inv.name || "Investor") + " — " + truncateAddr(inv.address) + (inv.frozen ? " (frozen)" : "")
+      }));
+    });
+    toSel.appendChild(el("option", {
+      value: "__stranger__",
+      text: "Stranger (random address) — no A-Pass, will be denied"
+    }));
+    if (prevTo && [].slice.call(toSel.options).some(function (o) { return o.value === prevTo; })) {
+      toSel.value = prevTo;
+    }
+  }
+
+  // ---------- deposit / transfer forms ----------
+
+  document.getElementById("form-deposit").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById("btn-deposit");
+    var tokenSel = document.getElementById("deposit-token");
+    var amount = parseFloat(document.getElementById("deposit-amount").value);
+    var tokenAddress = tokenSel.value === "__random__" ? randomAddress() : tokenSel.value;
+
+    if (!tokenAddress) { showToast("No token address available."); return; }
+    if (isNaN(amount) || amount <= 0) { showToast("Enter a valid amount."); return; }
+
+    setBtnLoading(btn, true, "Depositing…");
+    try {
+      var row = await api("/api/deposit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token_address: tokenAddress, amount: amount })
+      });
+      prependAudit(row);
+      await refreshState({ skipAuditFetch: true });
+    } catch (err) {
+      showToast(err.message);
+    } finally {
+      setBtnLoading(btn, false, "Deposit");
+    }
+  });
+
+  document.getElementById("form-transfer").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var btn = document.getElementById("btn-transfer");
+    var atokenSel = document.getElementById("transfer-token");
+    var toSel = document.getElementById("transfer-to");
+    var amount = parseFloat(document.getElementById("transfer-amount").value);
+    var toAddress = toSel.value === "__stranger__" ? randomAddress() : toSel.value;
+
+    if (!atokenSel.value) { showToast("No A-Token configured on rails."); return; }
+    if (!toAddress) { showToast("Choose a recipient."); return; }
+    if (isNaN(amount) || amount <= 0) { showToast("Enter a valid amount."); return; }
+
+    setBtnLoading(btn, true, "Transferring…");
+    try {
+      var row = await api("/api/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ atoken: atokenSel.value, to_address: toAddress, amount: amount })
+      });
+      prependAudit(row);
+      await refreshState({ skipAuditFetch: true });
+    } catch (err) {
+      showToast(err.message);
+    } finally {
+      setBtnLoading(btn, false, "Transfer");
+    }
+  });
+
+  // ---------- audit log ----------
+
+  function auditKey(row) {
+    return [row.ts, row.gate, row.subject, row.verdict].join("|");
+  }
+
+  function buildAuditRow(row, isNew) {
+    var allowed = !!row.allowed;
+    var verdict = row.verdict || "";
+    var isAllowText = /^ALLOW/i.test(verdict);
+
+    var wrap = el("div", {
+      class: "audit-row " + (allowed ? "allow" : "deny") + (isNew ? " flash" : "")
+    }, [
+      el("span", { class: "audit-ts", text: fmtTs(row.ts) }),
+      el("span", { class: "audit-gate", text: row.gate || "—" }),
+      addrSpan(row.subject, "audit-subject"),
+      el("span", {
+        class: "audit-verdict " + (isAllowText ? "allow-text" : "deny-text"),
+        text: verdict || (allowed ? "ALLOW" : "DENY")
+      })
+    ]);
+    return wrap;
+  }
+
+  function renderAuditList() {
+    var list = document.getElementById("audit-list");
+    var count = document.getElementById("audit-count");
+    list.innerHTML = "";
+    count.textContent = state.audit.length ? (state.audit.length + " event" + (state.audit.length === 1 ? "" : "s")) : "";
+
+    if (!state.audit.length) {
+      list.appendChild(el("div", { class: "empty-note", text: "No audit events yet." }));
+      return;
+    }
+
+    state.audit.forEach(function (row) {
+      list.appendChild(buildAuditRow(row, false));
+    });
+  }
+
+  function prependAudit(row) {
+    var key = auditKey(row);
+    if (seenAuditKeys.has(key)) return;
+    seenAuditKeys.add(key);
+    state.audit.unshift(row);
+
+    var list = document.getElementById("audit-list");
+    var emptyNote = list.querySelector(".empty-note");
+    if (emptyNote) emptyNote.remove();
+
+    var node = buildAuditRow(row, true);
+    list.insertBefore(node, list.firstChild);
+
+    var count = document.getElementById("audit-count");
+    count.textContent = state.audit.length + " event" + (state.audit.length === 1 ? "" : "s");
+  }
+
+  function mergeAudit(rows) {
+    // rows: newest-first from server. Merge in any we haven't seen, preserving order.
+    rows.forEach(function (row) {
+      var key = auditKey(row);
+      if (!seenAuditKeys.has(key)) {
+        seenAuditKeys.add(key);
+      }
+    });
+    state.audit = rows;
+  }
+
+  // ---------- state refresh ----------
+
+  async function refreshState(opts) {
+    opts = opts || {};
+    try {
+      var s = await api("/api/state");
+      state.chain = s.chain || "";
+      state.rails = s.rails || [];
+      state.holdings = s.holdings || [];
+      state.investors = s.investors || [];
+
+      renderRails();
+      renderInvestors();
+      renderHoldings();
+      renderFormOptions();
+    } catch (err) {
+      showToast("Failed to load state: " + err.message);
+    }
+
+    if (!opts.skipAuditFetch) {
+      try {
+        var audit = await api("/api/audit");
+        mergeAudit(audit || []);
+        renderAuditList();
+      } catch (err) {
+        showToast("Failed to load audit log: " + err.message);
+      }
+    }
+  }
+
+  async function pollAuditOnly() {
+    try {
+      var audit = await api("/api/audit");
+      (audit || []).slice().reverse().forEach(function (row) {
+        var key = auditKey(row);
+        if (!seenAuditKeys.has(key)) {
+          prependAudit(row);
+        }
+      });
+    } catch (err) {
+      // silent on background poll failure
+    }
+  }
+
+  // ---------- init ----------
+
+  refreshState().then(function () {
+    seenAuditKeys.clear();
+    state.audit.forEach(function (row) { seenAuditKeys.add(auditKey(row)); });
+  });
+
+  setInterval(function () {
+    refreshState({ skipAuditFetch: true }).then(pollAuditOnly);
+  }, 8000);
+})();
+</script>

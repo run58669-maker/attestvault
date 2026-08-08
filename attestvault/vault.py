@@ -29,7 +29,7 @@ class Vault:
     def __init__(self, client: CleanverseClient, chain: str, db_path: str = "attestvault.db"):
         self.cv = client
         self.chain = chain
-        self.db = sqlite3.connect(db_path)
+        self.db = sqlite3.connect(db_path, check_same_thread=False)
         self.db.execute(
             "CREATE TABLE IF NOT EXISTS audit_log ("
             " id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, gate TEXT,"
