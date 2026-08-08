@@ -12,6 +12,7 @@ that produced it.
 from __future__ import annotations
 
 import json
+import math
 import sqlite3
 import time
 
@@ -59,8 +60,16 @@ class Vault:
         data = self.cv.deposit_atoken_list(self.chain)
         return data.get("tokens", [])
 
+    @staticmethod
+    def _check_amount(amount: float) -> float:
+        amount = float(amount)
+        if not (math.isfinite(amount) and amount > 0):
+            raise ValueError("amount must be a positive finite number")
+        return amount
+
     def deposit(self, token_address: str, amount: float) -> dict:
         """Accept a deposit only if token_address is a registered A-Token."""
+        amount = self._check_amount(amount)
         for t in self.registered_atokens():
             at = t.get("atoken") or {}
             if at.get("address", "").lower() == token_address.lower():
@@ -80,6 +89,7 @@ class Vault:
         """Gate an outbound transfer on the counterparty's A-Pass. The
         transfer is only *constructed* after code 4 — a denial means no
         transaction ever exists, not a revert."""
+        amount = self._check_amount(amount)
         try:
             v = self.cv.verify_apass(to_address, self.chain, atoken)
         except CleanverseError as e:
@@ -96,6 +106,12 @@ class Vault:
         verdict = VERDICT_TEXT.get(code, f"DENY: unknown verify code {code}")
         allowed = code == VERIFY_OK
         if allowed:
+            row = self.db.execute("SELECT amount FROM holdings WHERE atoken = ?", (atoken,)).fetchone()
+            balance = row[0] if row else 0
+            if balance < amount:
+                return self._log("transfer", to_address,
+                                 f"DENY: insufficient vault holdings ({balance:g} < {amount:g})", False,
+                                 {"verify_response": v, "atoken": atoken, "amount": amount})
             self.db.execute("UPDATE holdings SET amount = amount - ? WHERE atoken = ?", (amount, atoken))
             self.db.commit()
         return self._log("transfer", to_address, verdict, allowed,

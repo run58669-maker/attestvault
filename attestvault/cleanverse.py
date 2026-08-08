@@ -58,6 +58,10 @@ class CleanverseClient:
                 out = json.loads(r.read().decode())
         except urllib.error.HTTPError as e:
             raise CleanverseError(str(e.code), e.read().decode()[:300])
+        except (OSError, ValueError) as e:
+            # network failure / timeout / bad JSON — surface as a client error
+            # so callers' fail-closed handling applies uniformly
+            raise CleanverseError("transport", f"{type(e).__name__}: {e}")
         if out.get("code") != "0000":
             raise CleanverseError(out.get("code", "?"), out.get("message", ""), out.get("data"))
         return out.get("data")

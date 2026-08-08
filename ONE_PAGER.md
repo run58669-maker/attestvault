@@ -25,7 +25,7 @@ The signature demo is the **freeze flip**: a transfer to an investor passes, the
 | 2 | Freeze / reinstate lifecycle | `update_status` | On-chain status change drives the gate live |
 | 3 | Transfer gating | `verify_apass` | All 4 result codes mapped to vault verdicts |
 | 4 | Asset registry gating | `query_deposit_atoken_list` | Deposits restricted to registered A-Tokens; access_core / A-Pass contract discovery |
-| 5 | Funding & evidence | `faucet`, `query_txs` | Sandbox funding and audit cross-checks |
+| 5 | Funding & evidence | `faucet`, `query_txs` | Client coverage for sandbox funding and tx queries (used during development; not called in the vault flow) |
 
 **Observed-behavior handling:** the docs specify verify code 3 for a frozen A-Pass; on Monad the sandbox actually surfaces a contract-level `APassNotActive` revert as a business error. AttestVault treats *any* verification failure as a denial (fail closed) and records the raw revert as evidence — integration at the contract-behavior level, not just the happy path.
 

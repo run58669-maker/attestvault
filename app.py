@@ -17,7 +17,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from attestvault.cleanverse import CleanverseClient, CleanverseError
 from attestvault.vault import Vault
 
-SECRETS = os.environ.get("CLEANVERSE_SECRETS", r"C:\Users\86150\Desktop\脚本\secrets\cleanverse.json")
+SECRETS = os.environ.get(
+    "CLEANVERSE_SECRETS",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "cleanverse.secrets.json"),
+)
 CHAIN = os.environ.get("ATTESTVAULT_CHAIN", "monad")
 DB = os.environ.get("ATTESTVAULT_DB", "attestvault.db")
 PORT = int(os.environ.get("ATTESTVAULT_PORT", "8990"))
@@ -140,4 +143,4 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     print(f"AttestVault on http://127.0.0.1:{PORT}/  (chain={CHAIN})")
-    ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
+    ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()

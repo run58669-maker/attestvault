@@ -34,7 +34,13 @@ The signature move is the **freeze flip**: a transfer to an investor passes → 
 
 ```bash
 pip install pycryptodome            # the single external dependency
-set CLEANVERSE_SECRETS=path\to\cleanverse.json   # {"sandbox_api_id": "...", "sandbox_api_key": "..."}
+
+# Credentials: put your Cleanverse sandbox api-id/api-key (issued with your
+# hackathon registration) in cleanverse.secrets.json next to app.py:
+#   {"sandbox_api_id": "...", "sandbox_api_key": "..."}
+# or point CLEANVERSE_SECRETS at the file:
+export CLEANVERSE_SECRETS=path/to/cleanverse.json        # bash
+# $env:CLEANVERSE_SECRETS = "path\to\cleanverse.json"    # PowerShell
 
 python demo.py                      # 8-step end-to-end story in the terminal (~60s)
 python app.py                       # web console → http://127.0.0.1:8990/

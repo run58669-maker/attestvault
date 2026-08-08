@@ -22,7 +22,10 @@ sys.stdout.reconfigure(encoding="utf-8")
 from attestvault.cleanverse import CleanverseClient
 from attestvault.vault import Vault
 
-SECRETS = os.environ.get("CLEANVERSE_SECRETS", r"C:\Users\86150\Desktop\脚本\secrets\cleanverse.json")
+SECRETS = os.environ.get(
+    "CLEANVERSE_SECRETS",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "cleanverse.secrets.json"),
+)
 CHAIN = "monad"
 
 
@@ -78,6 +81,9 @@ def main():
         print(f"  transfer retry -> {t3['verdict']}")
         if not t3["allowed"]:
             break
+    else:
+        print("  !! freeze has not propagated after 30s — the gate above still shows ALLOW;"
+              " wait a moment and rerun before trusting this run as a demo")
 
     step(7, "Unfreeze -> gate opens again")
     uf = cv.set_apass_status(alice, CHAIN, freeze=False)
@@ -88,6 +94,8 @@ def main():
         print(f"  transfer retry -> {t4['verdict']}")
         if t4["allowed"]:
             break
+    else:
+        print("  !! unfreeze has not propagated after 30s — rerun to see the gate reopen")
 
     step(8, "Audit log (every decision, with evidence)")
     for row in vault.audit(limit=12)[::-1]:
