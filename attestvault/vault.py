@@ -15,7 +15,7 @@ import json
 import sqlite3
 import time
 
-from .cleanverse import CleanverseClient, VERIFY_OK
+from .cleanverse import CleanverseClient, CleanverseError, VERIFY_OK
 
 VERDICT_TEXT = {
     1: "DENY: asset is not a registered A-Token",
@@ -80,7 +80,18 @@ class Vault:
         """Gate an outbound transfer on the counterparty's A-Pass. The
         transfer is only *constructed* after code 4 — a denial means no
         transaction ever exists, not a revert."""
-        v = self.cv.verify_apass(to_address, self.chain, atoken)
+        try:
+            v = self.cv.verify_apass(to_address, self.chain, atoken)
+        except CleanverseError as e:
+            # Fail closed: any verification error is a denial. In sandbox
+            # practice a frozen A-Pass surfaces as an APassNotActive contract
+            # revert (business code 0002) rather than the documented code 3.
+            if "APassNotActive" in str(e):
+                verdict = "DENY: counterparty A-Pass is frozen (on-chain APassNotActive)"
+            else:
+                verdict = f"DENY (fail-closed): verification error — {e}"
+            return self._log("transfer", to_address, verdict, False,
+                             {"error": str(e), "atoken": atoken, "amount": amount})
         code = v.get("code")
         verdict = VERDICT_TEXT.get(code, f"DENY: unknown verify code {code}")
         allowed = code == VERIFY_OK
